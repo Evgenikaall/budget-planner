@@ -1,0 +1,354 @@
+openapi: 3.0.3
+info:
+  title: Budget Planner API
+  description: API for managing personal budgets, categories, and expenses
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local server
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered
+        '409':
+          description: Username already exists
+  /auth/login:
+    post:
+      summary: Authenticate and obtain JWT token
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+  /budgets:
+    get:
+      summary: List all budgets
+      operationId: listBudgets
+      tags:
+        - budgets
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: A list of budgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BudgetDto'
+    post:
+      summary: Create a new budget
+      operationId: createBudget
+      tags:
+        - budgets
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetCreateDto'
+      responses:
+        '201':
+          description: Budget created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetDto'
+
+  /budgets/{budgetId}:
+    get:
+      summary: Get a budget by ID
+      operationId: getBudget
+      tags:
+        - budgets
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: budgetId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Budget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetDto'
+        '404':
+          description: Budget not found
+
+  /categories:
+    get:
+      summary: List all categories
+      operationId: listCategories
+      tags:
+        - categories
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryDto'
+    post:
+      summary: Create a new category
+      operationId: createCategory
+      tags:
+        - categories
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreateDto'
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDto'
+
+  /expenses:
+    get:
+      summary: List expenses with filtering
+      operationId: listExpenses
+      tags:
+        - expenses
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExpenseDto'
+    post:
+      summary: Log a new expense
+      operationId: createExpense
+      tags:
+        - expenses
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreateDto'
+      responses:
+        '201':
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseDto'
+
+  /expenses/{expenseId}:
+    delete:
+      summary: Delete an expense
+      operationId: deleteExpense
+      tags:
+        - expenses
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: expenseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Expense deleted
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+      required: [token]
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required: [username, password]
+    BudgetDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        limitAmount:
+          type: number
+          format: double
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - id
+        - name
+        - limitAmount
+
+    BudgetCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+        limitAmount:
+          type: number
+          format: double
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+      required:
+        - name
+        - limitAmount
+
+    CategoryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        color:
+          type: string
+      required:
+        - id
+        - name
+
+    CategoryCreateDto:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+      required:
+        - name
+
+    ExpenseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+        date:
+          type: string
+          format: date-time
+        categoryId:
+          type: string
+          format: uuid
+        categoryName:
+          type: string
+      required:
+        - id
+        - amount
+        - date
+
+    ExpenseCreateDto:
+      type: object
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double
+        date:
+          type: string
+          format: date-time
+        categoryId:
+          type: string
+          format: uuid
+      required:
+        - amount
+        - categoryId
+

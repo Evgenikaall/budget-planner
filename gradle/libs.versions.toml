@@ -2,11 +2,21 @@
 lombok = '9.0.0'
 postgres = "42.7.3"
 spring-boot = "4.0.1"
+openapi-generator = "7.2.0"
+swagger-annotations = "2.2.20"
+jackson-databind-nullable = "0.2.6"
+mapstruct = '1.6.3'
+mapstruct-processor = '1.6.3'
 
 [libraries]
-lombok = { module = 'org.projectlombok:lombok', version.ref = 'lombok' }
 postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "postgres" }
+swagger-annotations = { group = "io.swagger.core.v3", name = "swagger-annotations", version.ref = "swagger-annotations" }
+jackson-databind-nullable = { group = "org.openapitools", name = "jackson-databind-nullable", version.ref = "jackson-databind-nullable" }
+mapstruct = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct-processor" }
+
 
 [plugins]
 spring-boot = { id = 'org.springframework.boot', version.ref = 'spring-boot' }
 lombok = { id = 'io.freefair.lombok', version.ref = 'lombok' }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapi-generator" }

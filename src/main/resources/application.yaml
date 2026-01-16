@@ -1,3 +1,31 @@
 spring:
   application:
     name: budget-planner
+  datasource:
+    url: jdbc:postgresql://localhost:5432/budget_db
+    username: postgres
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+server:
+  servlet:
+    context-path: /api/v1
+security:
+  jwt:
+    secret: "change-this-secret-to-a-long-random-string-at-least-32-bytes-long"  # TODO: externalize
+    expiration-seconds: 3600
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
